@@ -191,7 +191,7 @@ class BetaTesterBulkAddition
       autoEnroll = @$checkbox_autoenroll.is(':checked')
       send_data = 
         action: $(event.target).data('action')  # 'add' or 'remove'
-        emails: @$emails_input.val()
+        identifiers: @$emails_input.val()
         email_students: emailStudents
         auto_enroll: autoEnroll
 
@@ -244,24 +244,24 @@ class BetaTesterBulkAddition
 
     if successes.length and data_from_server.action is 'add'
       `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users were successfully added as beta testers:"), (sr.email for sr in successes)
+      render_list gettext("These users were successfully added as beta testers:"), (sr.identifier for sr in successes)
 
     if successes.length and data_from_server.action is 'remove'
       `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users were successfully removed as beta testers:"), (sr.email for sr in successes)
+      render_list gettext("These users were successfully removed as beta testers:"), (sr.identifier for sr in successes)
 
     if errors.length and data_from_server.action is 'add'
       `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users were not added as beta testers:"), (sr.email for sr in errors)
+      render_list gettext("These users were not added as beta testers:"), (sr.identifier for sr in errors)
 
     if errors.length and data_from_server.action is 'remove'
       `// Translators: A list of users appears after this sentence`
-      render_list gettext("These users were not removed as beta testers:"), (sr.email for sr in errors)
+      render_list gettext("These users were not removed as beta testers:"), (sr.identifier for sr in errors)
 
     if no_users.length
-      no_users.push gettext("Users must create and activate their account before they can be promoted to beta tester.")
+      no_users.push $ gettext("Users must create and activate their account before they can be promoted to beta tester.")
       `// Translators: A list of identifiers (which are email addresses and/or usernames) appears after this sentence`
-      render_list gettext("Could not find users associated with the following identifiers:"), (sr.email for sr in no_users)
+      render_list gettext("Could not find users associated with the following identifiers:"), (sr.identifier for sr in no_users)
 
 # Wrapper for the batch enrollment subsection.
 # This object handles buttons, success and failure reporting,
@@ -281,7 +281,7 @@ class BatchEnrollment
       emailStudents: @$checkbox_emailstudents.is(':checked')
       send_data =
         action: $(event.target).data('action') # 'enroll' or 'unenroll'
-        emails: @$emails_input.val()
+        identifiers: @$emails_input.val()
         auto_enroll: @$checkbox_autoenroll.is(':checked')
         email_students: emailStudents
 
@@ -317,6 +317,8 @@ class BatchEnrollment
     #
     # invalid email addresses
     invalid_email = []
+    # invalid usernames
+    invalid_username = []
     # students for which there was an error during the action
     errors = []
     # students who are now enrolled in the course
@@ -334,7 +336,7 @@ class BatchEnrollment
     for student_results in data_from_server.results
       # for a successful action.
       # student_results is of the form {
-      #   "email": "jd405@edx.org",
+      #   "identifier": "jd405@edx.org",
       #   "before": {
       #     "enrollment": true,
       #     "auto_enroll": false,
@@ -351,13 +353,18 @@ class BatchEnrollment
       #
       # for an action error.
       # student_results is of the form {
-      #   'email': email,
+      #   'identifier': identifier,
+      #   # then one of:
       #   'error': True,
-      #   'invalidEmail': True,  # if email doesn't match "[^@]+@[^@]+\.[^@]+"
+      #   'invalidEmail': True,  # if identifier doesn't pass validate_email
+      #   'invalidUsername': True,  # if identifier doesn't have an "@" and can't find a valid User object
       # }
 
       if student_results.invalidEmail
         invalid_email.push student_results
+
+      else if student_results.invalidUsername
+        invalid_username.push student_results
 
       else if student_results.error
         errors.push student_results
@@ -395,7 +402,10 @@ class BatchEnrollment
       @$task_response.append task_res_section
 
     if invalid_email.length
-      render_list gettext("The following email addresses are invalid:"), (sr.email for sr in invalid_email)
+      render_list gettext("The following email addresses are invalid:"), (sr.identifier for sr in invalid_email)
+
+    if invalid_username.length
+      render_list gettext("Could not find users associated with the following usernames:"), (sr.identifier for sr in invalid_username)
 
     if errors.length
       errors_label = do ->
@@ -408,53 +418,53 @@ class BatchEnrollment
           "There was an error processing:"
 
       for student_results in errors
-        render_list errors_label, (sr.email for sr in errors)
+        render_list errors_label, (sr.identifier for sr in errors)
 
     if enrolled.length and emailStudents
-      render_list gettext("Successfully enrolled and sent email to the following users:"), (sr.email for sr in enrolled)
+      render_list gettext("Successfully enrolled and sent email to the following users:"), (sr.identifier for sr in enrolled)
 
     if enrolled.length and not emailStudents
       `// Translators: A list of users appears after this sentence`
-      render_list gettext("Successfully enrolled the following users:"), (sr.email for sr in enrolled)
+      render_list gettext("Successfully enrolled the following users:"), (sr.identifier for sr in enrolled)
 
     # Student hasn't registered so we allow them to enroll
     if allowed.length and emailStudents
       `// Translators: A list of users appears after this sentence`
       render_list gettext("Successfully sent enrollment emails to the following users. They will be allowed to enroll once they register:"),
-        (sr.email for sr in allowed)
+        (sr.identifier for sr in allowed)
 
     # Student hasn't registered so we allow them to enroll
     if allowed.length and not emailStudents
       `// Translators: A list of users appears after this sentence`
       render_list gettext("These users will be allowed to enroll once they register:"),
-        (sr.email for sr in allowed)
+        (sr.identifier for sr in allowed)
 
     # Student hasn't registered so we allow them to enroll with autoenroll
     if autoenrolled.length and emailStudents
       `// Translators: A list of users appears after this sentence`
       render_list gettext("Successfully sent enrollment emails to the following users. They will be enrolled once they register:"),
-        (sr.email for sr in autoenrolled)
+        (sr.identifier for sr in autoenrolled)
 
     # Student hasn't registered so we allow them to enroll with autoenroll
     if autoenrolled.length and not emailStudents
       `// Translators: A list of users appears after this sentence`
       render_list gettext("These users will be enrolled once they register:"),
-        (sr.email for sr in autoenrolled)
+        (sr.identifier for sr in autoenrolled)
 
     if notenrolled.length and emailStudents
       `// Translators: A list of users appears after this sentence`
       render_list gettext("Emails successfully sent. The following users are no longer enrolled in the course:"),
-        (sr.email for sr in notenrolled)
+        (sr.identifier for sr in notenrolled)
 
     if notenrolled.length and not emailStudents
       `// Translators: A list of users appears after this sentence`
       render_list gettext("The following users are no longer enrolled in the course:"),
-        (sr.email for sr in notenrolled)
+        (sr.identifier for sr in notenrolled)
 
     if notunenrolled.length
       `// Translators: A list of users appears after this sentence`
       render_list gettext("These users were not affiliated with the course so could not be unenrolled:"),
-        (sr.email for sr in notunenrolled)
+        (sr.identifier for sr in notunenrolled)
 
 # Wrapper for auth list subsection.
 # manages a list of users who have special access.
