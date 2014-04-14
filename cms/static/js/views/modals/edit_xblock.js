@@ -64,7 +64,17 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
 
             onDisplayXBlock: function() {
                 var editorView = this.editorView,
-                    title = this.getTitle();
+                    title = this.getTitle(),
+                    xblock = editorView.xblock,
+                    runtime = xblock.runtime;
+
+                // Notify the runtime that the modal has been shown
+                if (runtime) {
+                    this.runtime = runtime;
+                    runtime.notify("show-edit-modal", this);
+                }
+
+                // Update the modal's header
                 if (editorView.hasCustomTabs()) {
                     // Hide the modal's header as the custom editor provides its own
                     this.$('.modal-header').hide();
@@ -78,14 +88,17 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                         this.selectMode(editorView.mode);
                     }
                 }
+
                 // If the xblock is not using custom buttons then choose which buttons to show
                 if (!editorView.hasCustomButtons()) {
                     // If the xblock does not support save then disable the save button
-                    if (!editorView.xblock.save) {
+                    if (!xblock.save) {
                         this.disableSave();
                     }
                     this.getActionBar().show();
                 }
+
+                // Resize the modal to fit the window
                 this.resize();
             },
 
@@ -137,22 +150,28 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
             },
 
             save: function(event) {
-                var self = this,
-                    xblockInfo = this.xblockInfo,
-                    refresh = self.editOptions.refresh;
                 event.preventDefault();
                 this.editorView.save({
-                    success: function() {
-                        self.hide();
-                        if (refresh) {
-                            refresh(xblockInfo);
-                        }
-                    }
+                    success: _.bind(this.onSave, this)
                 });
             },
 
+            onSave: function() {
+                var refresh = this.editOptions.refresh;
+                this.hide();
+                if (refresh) {
+                    refresh(this.xblockInfo);
+                }
+            },
+
             hide: function() {
+                var runtime = this.runtime;
                 BaseModal.prototype.hide.call(this);
+
+                // Notify the runtime that the modal has been hidden
+                if (runtime) {
+                    runtime.notify('hide-modal');
+                }
 
                 // Completely clear the contents of the modal
                 this.undelegateEvents();

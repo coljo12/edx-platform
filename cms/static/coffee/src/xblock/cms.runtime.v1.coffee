@@ -57,6 +57,12 @@ define [
                 $('.component.editing').removeClass('editing')
                 @savingNotification.hide()
 
+        else if name == 'show-edit-modal'
+            @modal = data
+
+        else if name == 'hide-modal'
+            @modal = null
+
         else if name == 'cancel'
             @_hideModal()
 
@@ -66,8 +72,9 @@ define [
                 @alert.show()
 
       _hideModal: () ->
-          # Click on the true cancel button to close the modal
-          $('.wrapper-modal-window .action-cancel').click()
+          # Notify the modal that the save has completed so that it can close and refresh the xblock
+          if @modal
+              @modal.onSave()
 
           # Hide any alerts that are being shown
           if @alert.options.shown

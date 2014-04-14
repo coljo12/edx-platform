@@ -5,9 +5,9 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
         describe("EditXBlockModal", function() {
             var model, modal, showModal;
 
-            showModal = function(requests, mockHtml) {
+            showModal = function(requests, mockHtml, options) {
                 var xblockElement = $('.xblock');
-                return edit_helpers.showEditModal(requests, xblockElement, model, mockHtml);
+                return edit_helpers.showEditModal(requests, xblockElement, model, mockHtml, options);
             };
 
             beforeEach(function () {
@@ -64,6 +64,19 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     expect(modal.$('.editor-modes a').length).toBe(0);
                 });
 
+                it('hides itself and refreshes when onSave is called', function() {
+                    var requests = create_sinon.requests(this),
+                        refreshed = false,
+                        refresh = function() {
+                            refreshed = true;
+                        };
+                    modal = showModal(requests, mockXBlockEditorHtml, { refresh: refresh });
+                    modal.runtime.notify('save', { state: 'start' });
+                    modal.runtime.notify('save', { state: 'end' });
+                    expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
+                    expect(refreshed).toBeTruthy();
+                });
+
                 describe("Custom Buttons", function() {
                     var mockCustomButtonsHtml;
 
@@ -83,12 +96,11 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-editor.underscore');
 
                 beforeEach(function() {
-                    // Mock the VerticalDescriptor so that the module can be rendered
-                    window.VerticalDescriptor = XModule.Descriptor;
+                    edit_helpers.installMockXModule();
                 });
 
                 afterEach(function () {
-                    window.VerticalDescriptor = null;
+                    edit_helpers.uninstallMockXModule();
                 });
 
                 it('can render itself', function() {
@@ -159,12 +171,11 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                 mockXModuleEditorHtml = readFixtures('mock/mock-xmodule-settings-only-editor.underscore');
 
                 beforeEach(function() {
-                    // Mock the VerticalDescriptor so that the module can be rendered
-                    window.VerticalDescriptor = XModule.Descriptor;
+                    edit_helpers.installMockXModule();
                 });
 
                 afterEach(function () {
-                    window.VerticalDescriptor = null;
+                    edit_helpers.uninstallMockXModule();
                 });
 
                 it('can render itself', function() {
