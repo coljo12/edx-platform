@@ -54,10 +54,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 store['OPTIONS'],
                 i18n_service=i18n_service,
             )
-            # If and when locations can identify their course, we won't need
-            # these loc maps. They're needed for figuring out which store owns these locations.
-            if is_xml:
-                self.ensure_loc_maps_exist(key)
 
     def _get_modulestore_for_courseid(self, course_id):
         """
@@ -274,12 +270,7 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 parent.children.append(location.url())
                 store.update_item(parent)
         elif isinstance(store, SplitMongoModuleStore):
-            if isinstance(course_or_parent_loc, basestring):  # course_id
-                course_or_parent_loc = loc_mapper().translate_location_to_course_locator(
-                    # hardcode draft version until we figure out how we're handling branches from app
-                    SlashSeparatedCourseKey.from_deprecated_string(course_or_parent_loc), published=False
-                )
-            elif not isinstance(course_or_parent_loc, (CourseLocator, BlockUsageLocator)):
+            if not isinstance(course_or_parent_loc, (CourseLocator, BlockUsageLocator)):
                 raise ValueError(u"Cannot create a child of {} in split. Wrong repr.".format(course_or_parent_loc))
 
             # split handles all the fields in one dict not separated by scope
@@ -320,21 +311,6 @@ class MixedModuleStore(ModuleStoreWriteBase):
                 mstore.database.connection.close()
             elif hasattr(mstore, 'db'):
                 mstore.db.connection.close()
-
-    def ensure_loc_maps_exist(self, store_name):
-        """
-        Ensure location maps exist for every course in the modulestore whose
-        name is the given name (mostly used for 'xml'). It creates maps for any
-        missing ones.
-
-        NOTE: will only work if the given store is Location based. If it's not,
-        it raises NotImplementedError
-        """
-        store = self.modulestores[store_name]
-        if store.reference_type != Location:
-            raise ValueError(u"Cannot create maps from %s" % store.reference_type)
-        for course in store.get_courses():
-            loc_mapper().translate_location(course.location)
 
     def get_courses_for_wiki(self, wiki_slug):
         """
