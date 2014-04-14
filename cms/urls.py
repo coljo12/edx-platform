@@ -74,9 +74,9 @@ urlpatterns += patterns(
         'course_info_update_handler'
     ),
     url(r'^course/(?P<course_key_string>[^/]+)?$', 'course_handler'),
-    url(r'^subsection($|/)(?P<usage_key_string>[^/]+)$', 'subsection_handler'),
-    url(r'^unit($|/)(?P<usage_key_string>[^/]+)$', 'unit_handler'),
-    url(r'^container($|/)(?P<usage_key_string>[^/]+)$', 'container_handler'),
+    url(r'^subsection/(?P<usage_key_string>[^/]+)$', 'subsection_handler'),
+    url(r'^unit/(?P<usage_key_string>[^/]+)$', 'unit_handler'),
+    url(r'^container/(?P<usage_key_string>[^/]+)$', 'container_handler'),
     url(r'^checklists/(?P<course_key_string>[^/]+)/(?P<checklist_index>\d+)?$', 'checklists_handler'),
     url(r'^orphan/(?P<usage_key_string>[^/]+)$', 'orphan_handler'),
     url(r'^assets/(?P<course_key_string>[^/]+)(/)?(?P<asset_id>.+)?$', 'assets_handler'),
