@@ -72,7 +72,7 @@ class CourseUpdateTest(CourseTestCase):
         payload = get_response(content, 'January 11, 2013')
         self.assertHTMLEqual(content, payload['content'], "self closing ol")
 
-        course_update_url = self.create_update_url(provided_id=payload['id'])
+        course_update_url = self.create_update_url()
         resp = self.client.get_json(course_update_url)
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == 2)
@@ -124,7 +124,8 @@ class CourseUpdateTest(CourseTestCase):
         payload = json.loads(resp.content)
         before_delete = len(payload)
 
-        resp = self.client.delete(course_update_url)
+        url = self.create_update_url(provided_id=this_id)
+        resp = self.client.delete(url)
         payload = json.loads(resp.content)
         self.assertTrue(len(payload) == before_delete - 1)
 
