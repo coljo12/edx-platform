@@ -831,7 +831,11 @@ def textbooks_list_handler(request, course_key_string):
             course.tabs.append(PDFTextbookTabs())
         store.update_item(course, request.user.id)
         resp = JsonResponse(textbook, status=201)
-        resp["Location"] = locator.url_reverse('textbooks', textbook["id"])
+        resp["Location"] = reverse(
+            "contentstore.views.textbooks_detail_handler",
+            kwargs={'course_key_string': unicode(course.id),
+                    'textbook_id': textbook["id"]}
+        )
         return resp
 
 
