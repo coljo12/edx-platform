@@ -37,6 +37,10 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                 this.editOptions = options;
                 this.render();
                 this.show();
+
+                // Hide the action bar until we know which buttons we want
+                this.getActionBar().hide();
+
                 // Display the xblock after the modal is shown as there are some xblocks
                 // that depend upon being visible when they initialize, e.g. the problem xmodule.
                 this.displayXBlock();
@@ -74,7 +78,23 @@ define(["jquery", "underscore", "gettext", "js/views/modals/base_modal",
                         this.selectMode(editorView.mode);
                     }
                 }
+                // If the xblock is not using custom buttons then choose which buttons to show
+                if (!editorView.hasCustomButtons()) {
+                    // If the xblock does not support save then disable the save button
+                    if (!editorView.xblock.save) {
+                        this.disableSave();
+                    }
+                    this.getActionBar().show();
+                }
                 this.resize();
+            },
+
+            disableSave: function() {
+                var saveButton = this.getActionButton('save'),
+                    cancelButton = this.getActionButton('cancel');
+                saveButton.hide();
+                cancelButton.text(gettext('OK'));
+                cancelButton.addClass('action-primary');
             },
 
             getTitle: function() {

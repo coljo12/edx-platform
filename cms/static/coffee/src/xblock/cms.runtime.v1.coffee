@@ -52,26 +52,22 @@ define [
 
                 # Hide the editor *after* we finish saving in case there are validation
                 # errors that the user needs to correct.
-                @_hideEditor()
+                @_hideModal()
 
                 $('.component.editing').removeClass('editing')
                 @savingNotification.hide()
 
         else if name == 'cancel'
-            @_hideEditor()
+            @_hideModal()
 
         else if name == 'error'
             if 'msg' of data
                 @alert.options.message = data.msg
                 @alert.show()
 
-      _hideEditor: () ->
-          # This will close all open component editors, which works
-          # if we assume that <= 1 are open at a time.
-          el = $('.component.editing')
-          el.removeClass('editing')
-          el.find('.component-editor').slideUp(150)
-          ModalUtils.hideModalCover()
+      _hideModal: () ->
+          # Click on the true cancel button to close the modal
+          $('.wrapper-modal-window .action-cancel').click()
 
           # Hide any alerts that are being shown
           if @alert.options.shown

@@ -107,6 +107,47 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     });
                     expect(edit_helpers.isShowingModal()).toBeTruthy();
                 });
+            });
+
+            describe("Editing an xmodule", function() {
+                var mockContainerXBlockHtml,
+                    mockXModuleEditor,
+                    newDisplayName = 'New Display Name';
+
+                beforeEach(function () {
+                    edit_helpers.installMockXModule({
+                        data: "<p>Some HTML</p>",
+                        metadata: {
+                            display_name: newDisplayName
+                        }
+                    });
+                });
+
+                afterEach(function() {
+                    edit_helpers.uninstallMockXModule();
+                    edit_helpers.cancelModalIfShowing();
+                });
+
+                mockContainerXBlockHtml = readFixtures('mock/mock-container-xblock.underscore');
+                mockXModuleEditor = readFixtures('mock/mock-xmodule-editor.underscore');
+
+                it('can show an edit modal for a child xblock', function() {
+                    var editButtons;
+                    renderContainerPage(mockContainerXBlockHtml, this);
+                    editButtons = containerPage.$('.edit-button');
+                    // The container renders six mock xblocks, so there should be an equal number of edit buttons
+                    expect(editButtons.length).toBe(6);
+                    editButtons.first().click();
+                    // Make sure that the correct xblock is requested to be edited
+                    expect(lastRequest().url).toBe(
+                        '/xblock/locator-component-A1/studio_view'
+                    );
+                    create_sinon.respondWithJson(requests, {
+                        html: mockXModuleEditor,
+                        resources: []
+                    });
+                    expect(edit_helpers.isShowingModal()).toBeTruthy();
+                });
 
                 it('can save changes to settings', function() {
                     var editButtons, modal, mockUpdatedXBlockHtml;
@@ -117,7 +158,7 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/edit_helpers"
                     expect(editButtons.length).toBe(6);
                     editButtons.first().click();
                     create_sinon.respondWithJson(requests, {
-                        html: mockXBlockEditorHtml,
+                        html: mockXModuleEditor,
                         resources: []
                     });
 

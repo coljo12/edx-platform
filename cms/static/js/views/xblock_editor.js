@@ -49,6 +49,10 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 return this.$('.editor-with-tabs').length > 0;
             },
 
+            hasCustomButtons: function() {
+                return this.$('.editor-with-buttons').length > 0;
+            },
+
             createMetadataEditor: function() {
                 var metadataEditor,
                     metadataData,
@@ -88,7 +92,7 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 var xblockInfo = this.model,
                     data,
                     saving;
-                data = this.getXBlockData();
+                data = this.getXModuleData();
                 saving = new NotificationView.Mini({
                     title: gettext('Saving&hellip;')
                 });
@@ -102,7 +106,10 @@ define(["jquery", "underscore", "gettext", "js/views/feedback_notification", "js
                 });
             },
 
-            getXBlockData: function() {
+            /**
+             * Returns the data saved for the xmodule. Note that this *does not* work for XBlocks.
+             */
+            getXModuleData: function() {
                 var xblock = this.xblock,
                     metadataEditor = this.getMetadataEditor(),
                     data;

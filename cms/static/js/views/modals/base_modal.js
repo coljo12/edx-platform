@@ -98,7 +98,21 @@ define(["jquery", "underscore", "gettext", "js/views/baseview"],
                     name: name,
                     isPrimary: isPrimary
                 });
-                this.$('.modal-actions ul').append(html);
+                this.getActionBar().find('ul').append(html);
+            },
+
+            /**
+             * Returns the action bar that contains the modal's action buttons.
+             */
+            getActionBar: function() {
+                return this.$('.modal-window > div > .modal-actions');
+            },
+
+            /**
+             * Returns the action button of the specified type.
+             */
+            getActionButton: function(type) {
+                return this.getActionBar().find('.action-' + type);
             },
 
             resize: function() {

@@ -22,9 +22,6 @@ define(["jquery", "js/spec_helpers/create_sinon", "js/spec_helpers/modal_helpers
         installMockXBlock = function(mockResult) {
             window.MockXBlock = function(runtime, element) {
                 return {
-                    save: function() {
-                        return mockResult;
-                    }
                 };
             };
         };

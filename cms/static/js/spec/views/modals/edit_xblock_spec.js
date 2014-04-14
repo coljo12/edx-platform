@@ -45,6 +45,13 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     expect(edit_helpers.isShowingModal(modal)).toBeFalsy();
                 });
 
+                it('does not show the "Save" button', function() {
+                    var requests = create_sinon.requests(this);
+                    modal = showModal(requests, mockXBlockEditorHtml);
+                    expect(modal.$('.action-save')).not.toBeVisible();
+                    expect(modal.$('.action-cancel').text()).toBe('OK');
+                });
+
                 it('shows the correct title', function() {
                     var requests = create_sinon.requests(this);
                     modal = showModal(requests, mockXBlockEditorHtml);
@@ -55,6 +62,18 @@ define(["jquery", "underscore", "js/spec_helpers/create_sinon", "js/spec_helpers
                     var requests = create_sinon.requests(this);
                     modal = showModal(requests, mockXBlockEditorHtml);
                     expect(modal.$('.editor-modes a').length).toBe(0);
+                });
+
+                describe("Custom Buttons", function() {
+                    var mockCustomButtonsHtml;
+
+                    mockCustomButtonsHtml = readFixtures('mock/mock-xblock-editor-with-custom-buttons.underscore');
+
+                    it('hides the modal\'s button bar', function() {
+                        var requests = create_sinon.requests(this);
+                        modal = showModal(requests, mockCustomButtonsHtml);
+                        expect(modal.$('.modal-actions')).toBeHidden();
+                    });
                 });
             });
 
