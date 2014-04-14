@@ -268,7 +268,7 @@ The file includes a row for each problem-answer combination selected by your stu
 The CSV file contains the following columns:
 
 .. list-table::
-   :widths: 20 65
+   :widths: 20 60
    :header-rows: 1
 
    * - Column

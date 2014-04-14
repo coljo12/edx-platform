@@ -4,11 +4,9 @@
 Testing Your Course
 ###########################
 
-The way your course looks in Studio is not the way students see and experience your course.
+The way your course looks in Studio is not the way students see and experience it. To test your course, while you develop course content and afterward, you must view and interact with your course from a students' point of view.
 
-Therefore, as and after you develop course content, you must view and test your course from a students' point of view.
-
-From within Studio, you can test your course in two ways:
+From within Studio, you can:
 
 * :ref:`Preview Your Course`
 * :ref:`View Your Live Course`
@@ -57,18 +55,35 @@ You can enter Preview mode in two ways.
  
 .. _View Your Live Course:
 
-***********************
-View Your Live Course
-***********************
+******************************************
+Switch Between Studio and Your Live Course
+******************************************
 
-When you view your course as a course team member (that is, using the same account you use to build the course in Studio),
-you see all the units of your course that are set to **Public**, regardless of the release dates of the containing section or subsection.
- 
-You do not see units that are set to **Private**. To see Private units, you must use Preview mode as described above.
- 
-When you view your live course, you can execute tests to make sure your course works the way you intend. For example, the course team can work through all of the problems to verify that the correct answer gets a green check for correct, and that any answer other than the correct one gets a red X for incorrect. 
+While you work in Studio, you can switch to see how your course appears to students. Because you are logged in as a course team member, you see the **Staff View** of your course. 
 
-You can view the live course from three different places in Studio:
+  .. image:: ../Images/Live_Course_Staff_View.png
+   :width: 800
+   :alt: Image of the Courseware page in a live course with Staff View indicated at top right and a View Unit in Studio button
+ 
+In **Staff View**:
+
+* You see all of the units that are set to **Public**, regardless of the release dates of the containing section or subsection.  
+
+* You do not see units that are set to **Private**. To see Private units, you must use Preview mode as described above.
+
+* You have access to the Instructor Dashboard, which offers options and reports to help you run your course.
+
+.. You can also change to **Student View**. In **Student View**, the release date settings for sections and subsections apply. You can still access the Instructor Dashboard, however. 
+
+.. To switch from **Staff View** to **Student View** and back again, click **Staff View** or **Student View**.
+
+When you view your live course in **Staff View**, you can execute tests to make sure your course works the way you intend. For example, the course team can work through all of the problems to verify that the correct answer gets a green check for correct, and that any answer other than the correct one gets a red X for incorrect. 
+
+==========================
+Go to Your Live Course
+==========================
+
+To switch from Studio to your live course, click **View Live** on any of these pages:
  
 * The **Course Outline** page.
 
@@ -88,3 +103,24 @@ You can view the live course from three different places in Studio:
      :width: 800
      :alt: Image of a unit with the View Live button circled
 
+When you click **View Live**, the **Courseware** page or the corresponding subsection or unit page opens.
+
+============
+Go to Studio
+============
+
+To switch from your live course to Studio, click **View {page} in Studio** on any of these pages:
+ 
+* From any unit on the **Courseware** page (show in :ref:`View Your Live Course` above).
+ 
+* The Instructor Dashboard. For options on the Instructor Dashboard, see :ref:`Running Your Course Index`.
+ 
+  .. image:: ../Images/Live_Course_Instructor_Dashboard.png
+    :width: 800
+    :alt: Image of the Instructor Dashboard in a live course with a View Course in Studio button
+ 
+* The **Course Progress** page for a specified student. For information about checking student progress, see :ref:`Review_grades`.
+ 
+  .. image:: ../Images/Student_Progress.png
+     :width: 800
+     :alt: Image of the Course Progress page for a student with a View  Grading in Studio button
