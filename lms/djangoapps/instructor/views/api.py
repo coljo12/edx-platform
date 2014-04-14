@@ -254,26 +254,19 @@ def students_update_enrollment(request, course_id):
     for identifier in identifiers:
         # First try to get a user object from the identifer
         user = None
+        email = None
         try:
             user = get_student_from_identifier(identifier)
         except User.DoesNotExist:
-            # if this isn't an email address, don't go on
-            if '@' not in identifier:
-                results.append({
-                    'identifier': identifier,
-                    'invalidUsername': True,
-                })
-                continue
+            email = identifier
+        else:
+            email = user.email
 
         try:
-            email = identifier
-            if user is not None:
-                email = user.email
-            else:
-                # Use django.core.validators.validate_email to check email address
-                # validity (obviously, cannot check if email actually /exists/,
-                # simply that it is plausibly valid)
-                validate_email(email)  # Raises ValidationError if invalid
+            # Use django.core.validators.validate_email to check email address
+            # validity (obviously, cannot check if email actually /exists/,
+            # simply that it is plausibly valid)
+            validate_email(email)  # Raises ValidationError if invalid
 
             if action == 'enroll':
                 before, after = enroll_email(course_id, email, auto_enroll, email_students, email_params)
@@ -284,27 +277,29 @@ def students_update_enrollment(request, course_id):
                     "Unrecognized action '{}'".format(action)
                 ))
 
-            results.append({
-                'identifier': identifier,
-                'before': before.to_dict(),
-                'after': after.to_dict(),
-            })
         except ValidationError:
             # Flag this email as an error if invalid, but continue checking
             # the remaining in the list
             results.append({
                 'identifier': identifier,
-                'invalidEmail': True,
+                'invalidIdentifier': True,
             })
-            continue
-        # catch and log any exceptions
-        # so that one error doesn't cause a 500.
+
         except Exception as exc:  # pylint: disable=W0703
+            # catch and log any exceptions
+            # so that one error doesn't cause a 500.
             log.exception("Error while #{}ing student")
             log.exception(exc)
             results.append({
                 'identifier': identifier,
                 'error': True,
+            })
+
+        else:
+            results.append({
+                'identifier': identifier,
+                'before': before.to_dict(),
+                'after': after.to_dict(),
             })
 
     response_payload = {

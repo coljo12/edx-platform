@@ -306,7 +306,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "results": [
                 {
                     "identifier": 'percivaloctavius@',
-                    "invalidEmail": True,
+                    "invalidIdentifier": True,
                 }
             ]
         }
@@ -326,7 +326,7 @@ class TestInstructorAPIEnrollment(ModuleStoreTestCase, LoginEnrollmentTestCase):
             "results": [
                 {
                     "identifier": 'percivaloctavius',
-                    "invalidUsername": True,
+                    "invalidIdentifier": True,
                 }
             ]
         }
@@ -753,6 +753,8 @@ class TestInstructorAPIBulkBetaEnrollment(ModuleStoreTestCase, LoginEnrollmentTe
 
     def add_notenrolled(self, response, identifier):
         """
+        Test Helper Method (not a test, called by other tests)
+
         Takes a client response from a call to bulk_beta_modify_access with 'email_students': False,
         and the student identifier (email or username) given as 'identifiers' in the request.
 

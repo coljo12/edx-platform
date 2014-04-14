@@ -178,7 +178,7 @@ class AuthListWidget extends MemberListWidget
 class BetaTesterBulkAddition
   constructor: (@$container) ->
     # gather elements
-    @$emails_input           = @$container.find("textarea[name='student-emails-for-beta']")
+    @$identifier_input       = @$container.find("textarea[name='student-ids-for-beta']")
     @$btn_beta_testers       = @$container.find("input[name='beta-testers']")
     @$checkbox_emailstudents = @$container.find("input[name='email-students']")
     @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
@@ -191,7 +191,7 @@ class BetaTesterBulkAddition
       autoEnroll = @$checkbox_autoenroll.is(':checked')
       send_data = 
         action: $(event.target).data('action')  # 'add' or 'remove'
-        identifiers: @$emails_input.val()
+        identifiers: @$identifier_input.val()
         email_students: emailStudents
         auto_enroll: autoEnroll
 
@@ -204,7 +204,7 @@ class BetaTesterBulkAddition
 
   # clear the input text field
   clear_input: ->
-    @$emails_input.val ''
+    @$identifier_input.val ''
     # default for the checkboxes should be checked
     @$checkbox_emailstudents.attr('checked', true)
     @$checkbox_autoenroll.attr('checked', true)
@@ -231,14 +231,14 @@ class BetaTesterBulkAddition
       else
         successes.push student_results
 
-    render_list = (label, emails) =>
+    render_list = (label, ids) =>
       task_res_section = $ '<div/>', class: 'request-res-section'
       task_res_section.append $ '<h3/>', text: label
-      email_list = $ '<ul/>'
-      task_res_section.append email_list
+      ids_list = $ '<ul/>'
+      task_res_section.append ids_list
 
-      for email in emails
-        email_list.append $ '<li/>', text: email
+      for identifier in ids
+        ids_list.append $ '<li/>', text: identifier
 
       @$task_response.append task_res_section
 
@@ -269,7 +269,7 @@ class BetaTesterBulkAddition
 class BatchEnrollment
   constructor: (@$container) ->
     # gather elements
-    @$emails_input           = @$container.find("textarea[name='student-emails']")
+    @$identifier_input       = @$container.find("textarea[name='student-ids']")
     @$enrollment_button      = @$container.find(".enrollment-button")
     @$checkbox_autoenroll    = @$container.find("input[name='auto-enroll']")
     @$checkbox_emailstudents = @$container.find("input[name='email-students']")
@@ -281,7 +281,7 @@ class BatchEnrollment
       emailStudents: @$checkbox_emailstudents.is(':checked')
       send_data =
         action: $(event.target).data('action') # 'enroll' or 'unenroll'
-        identifiers: @$emails_input.val()
+        identifiers: @$identifier_input.val()
         auto_enroll: @$checkbox_autoenroll.is(':checked')
         email_students: emailStudents
 
@@ -295,7 +295,7 @@ class BatchEnrollment
 
   # clear the input text field
   clear_input: ->
-    @$emails_input.val ''
+    @$identifier_input.val ''
     # default for the checkboxes should be checked
     @$checkbox_emailstudents.attr('checked', true)
     @$checkbox_autoenroll.attr('checked', true)
@@ -315,10 +315,8 @@ class BatchEnrollment
     # these results arrays contain student_results
     # only populated arrays will be rendered
     #
-    # invalid email addresses
-    invalid_email = []
-    # invalid usernames
-    invalid_username = []
+    # invalid identifiers
+    invalid_identifier = []
     # students for which there was an error during the action
     errors = []
     # students who are now enrolled in the course
@@ -356,15 +354,11 @@ class BatchEnrollment
       #   'identifier': identifier,
       #   # then one of:
       #   'error': True,
-      #   'invalidEmail': True,  # if identifier doesn't pass validate_email
-      #   'invalidUsername': True,  # if identifier doesn't have an "@" and can't find a valid User object
+      #   'invalidIdentifier': True  # if identifier can't find a valid User object and doesn't pass validate_email
       # }
 
-      if student_results.invalidEmail
-        invalid_email.push student_results
-
-      else if student_results.invalidUsername
-        invalid_username.push student_results
+      if student_results.invalidIdentifier
+        invalid_identifier.push student_results
 
       else if student_results.error
         errors.push student_results
@@ -390,22 +384,19 @@ class BatchEnrollment
         console.warn student_results
 
     # render populated result arrays
-    render_list = (label, emails) =>
+    render_list = (label, ids) =>
       task_res_section = $ '<div/>', class: 'request-res-section'
       task_res_section.append $ '<h3/>', text: label
-      email_list = $ '<ul/>'
-      task_res_section.append email_list
+      ids_list = $ '<ul/>'
+      task_res_section.append ids_list
 
-      for email in emails
-        email_list.append $ '<li/>', text: email
+      for identifier in ids
+        ids_list.append $ '<li/>', text: identifier
 
       @$task_response.append task_res_section
 
-    if invalid_email.length
-      render_list gettext("The following email addresses are invalid:"), (sr.identifier for sr in invalid_email)
-
-    if invalid_username.length
-      render_list gettext("Could not find users associated with the following usernames:"), (sr.identifier for sr in invalid_username)
+    if invalid_identifier.length
+      render_list gettext("The following email addresses and/or usernames are invalid:"), (sr.identifier for sr in invalid_identifier)
 
     if errors.length
       errors_label = do ->
