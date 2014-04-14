@@ -6,10 +6,11 @@ from bok_choy.web_app_test import WebAppTest
 from bok_choy.promise import EmptyPromise
 
 
-def wait_for_ajax(browser):
+def wait_for_ajax(browser, try_limit=None, try_interval=0.5, timeout=60):
     """ Make sure that all ajax requests are finished.
     :param browser: selenium.webdriver, The Selenium-controlled browser that this page is loaded in.
     """
+
     def _is_ajax_finished():
         """
         Check if all the ajax call on current page completed.
@@ -17,7 +18,9 @@ def wait_for_ajax(browser):
         """
         return browser.execute_script("return jQuery.active") == 0
 
-    EmptyPromise(_is_ajax_finished, "Finished waiting for ajax requests.").fulfill()
+    EmptyPromise(_is_ajax_finished, "Finished waiting for ajax requests.", try_limit=try_limit,
+                 try_interval=try_interval, timeout=timeout).fulfill()
+
 
 def load_data_str(rel_path):
     """
